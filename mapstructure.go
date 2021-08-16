@@ -1,6 +1,7 @@
 package gox
 
 import (
+	`github.com/mcuadros/go-defaults`
 	`github.com/mitchellh/mapstructure`
 )
 
@@ -63,7 +64,11 @@ func CopyStruct(from interface{}, to interface{}, opts ...mapstructOption) (err 
 	if tmp, err = StructToMap(from, opts...); nil != err {
 		return
 	}
-	err = MapToStruct(tmp, to, opts...)
+	if err = MapToStruct(tmp, to, opts...); nil != err {
+		return
+	}
+
+	defaults.SetDefaults(to)
 
 	return
 }

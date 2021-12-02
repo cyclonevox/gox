@@ -64,7 +64,7 @@ func (b *Bitmap) And(c *Bitmap) {
 		*b = append(*b, make([]uint64, lenC-lenB)...)
 	}
 	if lenB > lenC {
-		*b = append(*b, make([]uint64, lenB-lenC)...)
+		*c = append(*c, make([]uint64, lenB-lenC)...)
 	}
 
 	for i := range *b {
@@ -78,7 +78,7 @@ func (b *Bitmap) Or(c *Bitmap) {
 		*b = append(*b, make([]uint64, lenC-lenB)...)
 	}
 	if lenB > lenC {
-		*b = append(*b, make([]uint64, lenB-lenC)...)
+		*c = append(*c, make([]uint64, lenB-lenC)...)
 	}
 
 	for i := range *b {

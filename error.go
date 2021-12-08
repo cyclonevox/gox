@@ -2,6 +2,7 @@ package gox
 
 import (
 	`encoding/json`
+	`fmt`
 )
 
 type (
@@ -67,4 +68,11 @@ func (ce *CodeError) Error() (str string) {
 	}
 
 	return
+}
+
+func (ce *CodeError) Parse(i ...interface{}) *CodeError {
+	e := *ce
+	e.Message = fmt.Sprintf(e.Message, i...)
+
+	return &e
 }

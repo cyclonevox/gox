@@ -33,6 +33,12 @@ func (b *Bitmap) Add(key int) bool {
 	return true
 }
 
+func (b *Bitmap) Adds(keys ...int) {
+	for _, key := range keys {
+		b.Add(key)
+	}
+}
+
 func (b *Bitmap) AddNX(key int) bool {
 	if b.length() <= key/bitmapSize {
 		*b = append(*b, make([]uint64, key/64-b.length()+1)...)
@@ -56,6 +62,12 @@ func (b *Bitmap) Delete(key int) bool {
 	b.reduce()
 
 	return true
+}
+
+func (b *Bitmap) Deletes(keys ...int) {
+	for _, key := range keys {
+		b.Delete(key)
+	}
 }
 
 func (b *Bitmap) And(c *Bitmap) {

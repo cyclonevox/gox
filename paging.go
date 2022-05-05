@@ -37,6 +37,10 @@ func (s SortBy) Sorters() []elastic.Sorter {
 }
 
 func (s SortBy) sorters() sorters {
+	if strings.TrimSpace(string(s)) == "" {
+		return nil
+	}
+
 	fields := strings.Split(string(s), ",")
 	if len(fields) == 0 {
 		return nil

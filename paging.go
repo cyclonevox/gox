@@ -2,6 +2,7 @@ package gox
 
 import (
 	`fmt`
+	`reflect`
 	`strings`
 
 	`github.com/olivere/elastic/v7`
@@ -117,4 +118,31 @@ func (p *Paging) Start() int {
 // Limit 获得限制个数
 func (p *Paging) Limit() int {
 	return p.PerPage
+}
+
+// ManualPaging 手动分页
+func ManualPaging(slice interface{}, page int, perPage int) interface{} {
+	typ := reflect.TypeOf(slice)
+	if typ.Kind() != reflect.Slice {
+		panic(typ.Name() + "不是切片")
+	}
+
+	var (
+		length int
+		value  = reflect.ValueOf(slice)
+		rsp    = reflect.MakeSlice(typ, 0, perPage)
+	)
+
+	if length = value.Len(); length == 0 {
+		return rsp.Interface()
+	}
+
+	start := (page - 1) * perPage
+	if start < length {
+		for i := 0; start+i < length && i < perPage; i++ {
+			rsp = reflect.Append(rsp, value.Index(start+i))
+		}
+	}
+
+	return rsp.Interface()
 }

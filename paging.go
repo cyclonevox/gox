@@ -30,6 +30,13 @@ type Paging struct {
 	SortOrder string `default:"DESC" json:"sortOrder" param:"sortOrder" query:"sortOrder" form:"sortOrder" xml:"sortOrder"  validate:"oneof=asc ASC ascending ASCENDING desc DESC descending DESCENDING"`
 }
 
+func (p Paging) manual() ManualPagingInfo {
+	return ManualPagingInfo{
+		Page:    p.Page,
+		PerPage: p.PerPage,
+	}
+}
+
 func (s SortBy) OrderBy() string {
 	return s.sorters().orderBy()
 }
@@ -130,12 +137,11 @@ type manualPaging struct {
 }
 
 type ManualPagingInfo struct {
-	page    int
-	perPage int
-	SortBy  SortBy
+	Page    int
+	PerPage int
 }
 
-func NewManualPaging(slice interface{}, pagingInfo ManualPagingInfo) *manualPaging {
+func NewManualPaging(slice interface{}, paging Paging) *manualPaging {
 	typ := reflect.TypeOf(slice)
 	if typ.Kind() != reflect.Slice {
 		panic(typ.Name() + "不是切片")
@@ -145,18 +151,14 @@ func NewManualPaging(slice interface{}, pagingInfo ManualPagingInfo) *manualPagi
 		typ:        typ,
 		slice:      slice,
 		sliceValue: reflect.ValueOf(slice),
-		info: ManualPagingInfo{
-			page:    pagingInfo.page,
-			perPage: pagingInfo.perPage,
-			SortBy:  pagingInfo.SortBy,
-		},
+		info:       paging.manual(),
 	}
 }
 
-func (mp *manualPaging) Sort() *manualPaging {
-	sorters := mp.info.SortBy.sorters()
+func (mp *manualPaging) Sort(sortBy SortBy) *manualPaging {
+	sorters := sortBy.sorters()
 	if len(sorters) == 0 {
-		panic(mp.info.SortBy + ":缺少合法的排序字段")
+		panic(sortBy + ":缺少合法的排序字段")
 	}
 	mp.sorters = sorters
 
@@ -236,24 +238,25 @@ func (mp *manualPaging) compare(i, j, sorterIndex int) bool {
 	}
 }
 
-func (mp *manualPaging) GetSliceInterface() interface{} {
+// GetInterface 获取slice结果
+func (mp *manualPaging) GetInterface() interface{} {
 	return mp.sliceValue.Interface()
 }
 
-// ManualPaging 手动分页
-func (mp *manualPaging) ManualPaging() interface{} {
+// Paging 手动分页操作
+func (mp *manualPaging) Paging() interface{} {
 	var (
 		length int
-		rsp    = reflect.MakeSlice(mp.typ, 0, mp.info.perPage)
+		rsp    = reflect.MakeSlice(mp.typ, 0, mp.info.PerPage)
 	)
 
 	if length = mp.sliceValue.Len(); length == 0 {
 		return mp.sliceValue.Interface()
 	}
 
-	start := (mp.info.page - 1) * mp.info.perPage
+	start := (mp.info.Page - 1) * mp.info.PerPage
 	if start < length {
-		for i := 0; start+i < length && i < mp.info.perPage; i++ {
+		for i := 0; start+i < length && i < mp.info.PerPage; i++ {
 			rsp = reflect.Append(rsp, mp.sliceValue.Index(start+i))
 		}
 	}

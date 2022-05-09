@@ -31,20 +31,38 @@ func TestManualPaging_Sort(t *testing.T) {
 		{id: 5, sum: 70, count: 1, proportion: 0.8},
 	}
 
-	sortedData := NewManualPaging(originData, ManualPagingInfo{
-		page:    2,
-		perPage: 5,
-		SortBy:  "sum DESC,count DESC,proportion DESC,id ASC",
-	}).Sort()
+	sortedData := NewManualPaging(originData, Paging{
+		Page:    2,
+		PerPage: 3,
+	}).Sort("sum DESC,count DESC,proportion DESC,id ASC")
 
-	results := sortedData.GetSliceInterface().([]test)
+	results := sortedData.GetInterface().([]test)
+	fmt.Println("Slice By Sort:")
 	for _, result := range results {
 		fmt.Println(result)
 	}
 
 	for index := range expected {
 		if results[index] != expected[index] {
-			t.Fatalf("第%v元素,期望：%v，实际：%v", index, expected[index], results[index])
+			t.Fatalf("sort(),第%v元素,期望：%v，实际：%v", index, expected[index], results[index])
+		}
+	}
+
+	pagingResults := sortedData.Paging().([]test)
+	expectedPaging := []test{
+		{id: 4, sum: 76, count: 3, proportion: 0.4},
+		{id: 2, sum: 70, count: 2, proportion: 0.6},
+		{id: 5, sum: 70, count: 1, proportion: 0.8},
+	}
+
+	fmt.Println("Slice By Sort And Paging:")
+	for _, result := range pagingResults {
+		fmt.Println(result)
+	}
+
+	for index := range expectedPaging {
+		if pagingResults[index] != expectedPaging[index] {
+			t.Fatalf("sort(),第%v元素,期望：%v，实际：%v", index, pagingResults[index], expectedPaging[index])
 		}
 	}
 

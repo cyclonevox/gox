@@ -199,13 +199,21 @@ func (mp *manualPaging) Sort(sortBy SortBy) *manualPaging {
 	return mp
 }
 
+func structValue(value reflect.Value) reflect.Value {
+	if reflect.Ptr == value.Kind() {
+		return value.Elem()
+	}
+
+	return value
+}
+
 func (mp *manualPaging) compare(i, j, sorterIndex int) bool {
 	if sorterIndex > len(mp.sorters) {
 		// It means two same values when function runs in this judge true
 		return false
 	}
-	firstValue := mp.sliceValue.Index(i).FieldByName(mp.sorters[sorterIndex].Field)
-	secondValue := mp.sliceValue.Index(j).FieldByName(mp.sorters[sorterIndex].Field)
+	firstValue := structValue(mp.sliceValue.Index(i)).FieldByName(mp.sorters[sorterIndex].Field)
+	secondValue := structValue(mp.sliceValue.Index(j)).FieldByName(mp.sorters[sorterIndex].Field)
 
 	if firstValue.Kind() != secondValue.Kind() {
 		panic("cannot sort the values with different types")

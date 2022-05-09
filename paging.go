@@ -71,6 +71,36 @@ func (s SortBy) sorters() sorters {
 	return sorters
 }
 
+// 排序字段转换 下划线转大驼峰
+func (s sorters) fieldMarshal() sorters {
+	for index, singleSorter := range s {
+		field := singleSorter.Field
+		if field == "" {
+			continue
+		}
+
+		temp := strings.Split(field, "_")
+		var str string
+		for _, value := range temp {
+			runeValue := []rune(value)
+			if len(runeValue) > 0 {
+				if runeValue[0] >= 'a' && runeValue[0] <= 'z' {
+					// 首字母大写
+					runeValue[0] -= 32
+				}
+				str += string(runeValue)
+			}
+		}
+
+		s[index] = sorter{
+			Field:     str,
+			Ascending: singleSorter.Ascending,
+		}
+	}
+
+	return s
+}
+
 func (s sorters) orderBy() string {
 	if len(s) == 0 {
 		return ""
@@ -156,7 +186,7 @@ func NewManualPaging(slice interface{}, paging Paging) *manualPaging {
 }
 
 func (mp *manualPaging) Sort(sortBy SortBy) *manualPaging {
-	sorters := sortBy.sorters()
+	sorters := sortBy.sorters().fieldMarshal()
 	if len(sorters) == 0 {
 		panic(sortBy + ":缺少合法的排序字段")
 	}

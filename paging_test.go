@@ -7,34 +7,34 @@ import (
 
 func TestManualPaging_Sort(t *testing.T) {
 	type test struct {
-		id         int64
-		sum        int
-		count      int
-		proportion float32
+		Id           int64
+		CourseSum    int
+		TeacherCount int
+		Proportion   float32
 	}
 
 	originData := []test{
-		{id: 3, sum: 76, count: 3, proportion: 0.4},
-		{id: 6, sum: 86, count: 2, proportion: 0.3},
-		{id: 2, sum: 70, count: 2, proportion: 0.6},
-		{id: 4, sum: 76, count: 3, proportion: 0.4},
-		{id: 5, sum: 70, count: 1, proportion: 0.8},
-		{id: 1, sum: 86, count: 2, proportion: 0.5},
+		{Id: 3, CourseSum: 76, TeacherCount: 3, Proportion: 0.4},
+		{Id: 6, CourseSum: 86, TeacherCount: 2, Proportion: 0.3},
+		{Id: 2, CourseSum: 70, TeacherCount: 2, Proportion: 0.6},
+		{Id: 4, CourseSum: 76, TeacherCount: 3, Proportion: 0.4},
+		{Id: 5, CourseSum: 70, TeacherCount: 1, Proportion: 0.8},
+		{Id: 1, CourseSum: 86, TeacherCount: 2, Proportion: 0.5},
 	}
 
 	expected := []test{
-		{id: 1, sum: 86, count: 2, proportion: 0.5},
-		{id: 6, sum: 86, count: 2, proportion: 0.3},
-		{id: 3, sum: 76, count: 3, proportion: 0.4},
-		{id: 4, sum: 76, count: 3, proportion: 0.4},
-		{id: 2, sum: 70, count: 2, proportion: 0.6},
-		{id: 5, sum: 70, count: 1, proportion: 0.8},
+		{Id: 1, CourseSum: 86, TeacherCount: 2, Proportion: 0.5},
+		{Id: 6, CourseSum: 86, TeacherCount: 2, Proportion: 0.3},
+		{Id: 3, CourseSum: 76, TeacherCount: 3, Proportion: 0.4},
+		{Id: 4, CourseSum: 76, TeacherCount: 3, Proportion: 0.4},
+		{Id: 2, CourseSum: 70, TeacherCount: 2, Proportion: 0.6},
+		{Id: 5, CourseSum: 70, TeacherCount: 1, Proportion: 0.8},
 	}
 
 	sortedData := NewManualPaging(originData, Paging{
 		Page:    2,
 		PerPage: 3,
-	}).Sort("sum DESC,count DESC,proportion DESC,id ASC")
+	}).Sort("course_sum DESC,teacher_count DESC,proportion DESC,id ASC")
 
 	results := sortedData.GetInterface().([]test)
 	fmt.Println("Slice By Sort:")
@@ -50,9 +50,9 @@ func TestManualPaging_Sort(t *testing.T) {
 
 	pagingResults := sortedData.Paging().([]test)
 	expectedPaging := []test{
-		{id: 4, sum: 76, count: 3, proportion: 0.4},
-		{id: 2, sum: 70, count: 2, proportion: 0.6},
-		{id: 5, sum: 70, count: 1, proportion: 0.8},
+		{Id: 4, CourseSum: 76, TeacherCount: 3, Proportion: 0.4},
+		{Id: 2, CourseSum: 70, TeacherCount: 2, Proportion: 0.6},
+		{Id: 5, CourseSum: 70, TeacherCount: 1, Proportion: 0.8},
 	}
 
 	fmt.Println("Slice By Sort And Paging:")

@@ -188,7 +188,7 @@ func NewManualPaging(slice interface{}, paging Paging) *manualPaging {
 func (mp *manualPaging) Sort(sortBy SortBy) *manualPaging {
 	sorters := sortBy.sorters().fieldMarshal()
 	if len(sorters) == 0 {
-		panic(sortBy + ":缺少合法的排序字段")
+		return mp
 	}
 	mp.sorters = sorters
 

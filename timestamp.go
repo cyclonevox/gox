@@ -112,6 +112,11 @@ func (t Timestamp) DayEnd() Timestamp {
 	return Timestamp(ts)
 }
 
+// UnixMicro 获取毫秒级的时间戳
+func (t Timestamp) UnixMicro() int64 {
+	return t.Time().UnixNano() / 1e6
+}
+
 func TruncateDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }

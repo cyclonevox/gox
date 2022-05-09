@@ -71,6 +71,36 @@ func (s SortBy) sorters() sorters {
 	return sorters
 }
 
+// 排序字段转换 下划线转大驼峰
+func (s sorters) fieldMarshal() sorters {
+	for index, singleSorter := range s {
+		field := singleSorter.Field
+		if field == "" {
+			continue
+		}
+
+		temp := strings.Split(field, "_")
+		var str string
+		for _, value := range temp {
+			runeValue := []rune(value)
+			if len(runeValue) > 0 {
+				if runeValue[0] >= 'a' && runeValue[0] <= 'z' {
+					// 首字母大写
+					runeValue[0] -= 32
+				}
+				str += string(runeValue)
+			}
+		}
+
+		s[index] = sorter{
+			Field:     str,
+			Ascending: singleSorter.Ascending,
+		}
+	}
+
+	return s
+}
+
 func (s sorters) orderBy() string {
 	if len(s) == 0 {
 		return ""
@@ -156,9 +186,9 @@ func NewManualPaging(slice interface{}, paging Paging) *manualPaging {
 }
 
 func (mp *manualPaging) Sort(sortBy SortBy) *manualPaging {
-	sorters := sortBy.sorters()
+	sorters := sortBy.sorters().fieldMarshal()
 	if len(sorters) == 0 {
-		panic(sortBy + ":缺少合法的排序字段")
+		return mp
 	}
 	mp.sorters = sorters
 
@@ -169,13 +199,21 @@ func (mp *manualPaging) Sort(sortBy SortBy) *manualPaging {
 	return mp
 }
 
+func structValue(value reflect.Value) reflect.Value {
+	if reflect.Ptr == value.Kind() {
+		return value.Elem()
+	}
+
+	return value
+}
+
 func (mp *manualPaging) compare(i, j, sorterIndex int) bool {
 	if sorterIndex > len(mp.sorters) {
 		// It means two same values when function runs in this judge true
 		return false
 	}
-	firstValue := mp.sliceValue.Index(i).FieldByName(mp.sorters[sorterIndex].Field)
-	secondValue := mp.sliceValue.Index(j).FieldByName(mp.sorters[sorterIndex].Field)
+	firstValue := structValue(mp.sliceValue.Index(i)).FieldByName(mp.sorters[sorterIndex].Field)
+	secondValue := structValue(mp.sliceValue.Index(j)).FieldByName(mp.sorters[sorterIndex].Field)
 
 	if firstValue.Kind() != secondValue.Kind() {
 		panic("cannot sort the values with different types")

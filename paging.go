@@ -3,6 +3,7 @@ package gox
 import (
 	`fmt`
 	`reflect`
+	`sort`
 	`strings`
 
 	`github.com/olivere/elastic/v7`
@@ -120,27 +121,140 @@ func (p *Paging) Limit() int {
 	return p.PerPage
 }
 
-// ManualPaging 手动分页
-func ManualPaging(slice interface{}, page int, perPage int) interface{} {
+type manualPaging struct {
+	slice      interface{}
+	typ        reflect.Type
+	sliceValue reflect.Value
+	sorters    sorters
+	info       ManualPagingInfo
+}
+
+type ManualPagingInfo struct {
+	page    int
+	perPage int
+	SortBy  SortBy
+}
+
+func NewManualPaging(slice interface{}, pagingInfo ManualPagingInfo) *manualPaging {
 	typ := reflect.TypeOf(slice)
 	if typ.Kind() != reflect.Slice {
 		panic(typ.Name() + "不是切片")
 	}
 
-	var (
-		length int
-		value  = reflect.ValueOf(slice)
-		rsp    = reflect.MakeSlice(typ, 0, perPage)
-	)
+	return &manualPaging{
+		typ:        typ,
+		slice:      slice,
+		sliceValue: reflect.ValueOf(slice),
+		info: ManualPagingInfo{
+			page:    pagingInfo.page,
+			perPage: pagingInfo.perPage,
+			SortBy:  pagingInfo.SortBy,
+		},
+	}
+}
 
-	if length = value.Len(); length == 0 {
-		return rsp.Interface()
+func (mp *manualPaging) Sort() *manualPaging {
+	sorters := mp.info.SortBy.sorters()
+	if len(sorters) == 0 {
+		panic(mp.info.SortBy + ":缺少合法的排序字段")
+	}
+	mp.sorters = sorters
+
+	sort.Slice(mp.slice, func(i, j int) bool {
+		return mp.compare(i, j, 0)
+	})
+
+	return mp
+}
+
+func (mp *manualPaging) compare(i, j, sorterIndex int) bool {
+	if sorterIndex > len(mp.sorters) {
+		// It means two same values when function runs in this judge true
+		return false
+	}
+	firstValue := mp.sliceValue.Index(i).FieldByName(mp.sorters[sorterIndex].Field)
+	secondValue := mp.sliceValue.Index(j).FieldByName(mp.sorters[sorterIndex].Field)
+
+	if firstValue.Kind() != secondValue.Kind() {
+		panic("cannot sort the values with different types")
 	}
 
-	start := (page - 1) * perPage
+	switch firstValue.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16,
+		reflect.Int32, reflect.Int64:
+		if firstValue.Int() == secondValue.Int() {
+			sorterIndex++
+			return mp.compare(i, j, sorterIndex)
+		}
+
+		if mp.sorters[sorterIndex].Ascending {
+			b := firstValue.Int() < secondValue.Int()
+			return b
+		} else {
+			b := firstValue.Int() > secondValue.Int()
+			return b
+		}
+
+	case reflect.Uint, reflect.Uint8, reflect.Uint16,
+		reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		if firstValue.Uint() == secondValue.Uint() {
+			sorterIndex++
+			return mp.compare(i, j, sorterIndex)
+		}
+
+		if mp.sorters[sorterIndex].Ascending {
+			return firstValue.Uint() < secondValue.Uint()
+		} else {
+			return firstValue.Uint() > secondValue.Uint()
+		}
+
+	case reflect.Float32, reflect.Float64:
+		if firstValue.Float() == secondValue.Float() {
+			sorterIndex++
+			return mp.compare(i, j, sorterIndex)
+		}
+
+		if mp.sorters[sorterIndex].Ascending {
+			return firstValue.Float() < secondValue.Float()
+		} else {
+			return firstValue.Float() > secondValue.Float()
+		}
+
+	case reflect.Bool:
+		if firstValue.Bool() == secondValue.Bool() {
+			sorterIndex++
+			return mp.compare(i, j, sorterIndex)
+		}
+
+		if mp.sorters[sorterIndex].Ascending {
+			return firstValue.Bool()
+		} else {
+			return secondValue.Bool()
+		}
+	default:
+		panic(mp.sorters[sorterIndex].Field + ":sort function just supports int float bool")
+	}
+}
+
+func (mp *manualPaging) GetSliceInterface() interface{} {
+	return mp.sliceValue.Interface()
+}
+
+// ManualPaging 手动分页
+func (mp *manualPaging) ManualPaging() interface{} {
+	var (
+		length int
+		rsp    = reflect.MakeSlice(mp.typ, 0, mp.info.perPage)
+	)
+
+	if length = mp.sliceValue.Len(); length == 0 {
+		return mp.sliceValue.Interface()
+	}
+
+	start := (mp.info.page - 1) * mp.info.perPage
 	if start < length {
-		for i := 0; start+i < length && i < perPage; i++ {
-			rsp = reflect.Append(rsp, value.Index(start+i))
+		for i := 0; start+i < length && i < mp.info.perPage; i++ {
+			rsp = reflect.Append(rsp, mp.sliceValue.Index(start+i))
 		}
 	}
 

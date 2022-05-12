@@ -3,6 +3,7 @@ module github.com/storezhang/gox
 go 1.16
 
 require (
+	github.com/go-redis/redis/v8 v8.11.2
 	github.com/mcuadros/go-defaults v1.2.0
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/olivere/elastic/v7 v7.0.32

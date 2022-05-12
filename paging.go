@@ -208,7 +208,7 @@ func structValue(value reflect.Value) reflect.Value {
 }
 
 func (mp *manualPaging) compare(i, j, sorterIndex int) bool {
-	if sorterIndex > len(mp.sorters) {
+	if sorterIndex >= len(mp.sorters) {
 		// It means two same values when function runs in this judge true
 		return false
 	}

@@ -10,13 +10,19 @@ type FillFunc func(i int)
 
 // Fills 并发将slice切片（需要元素为相同类型）里的每一个元素，作为fun的参数并调用fun
 func Fills(slice interface{}, fun FillFunc, maxGoroutines ...int) {
-	max := 20
+	max := 15
 	if len(maxGoroutines) != 0 && maxGoroutines[0] > 0 {
 		max = maxGoroutines[0]
 	}
 
 	value := reflect.ValueOf(slice)
 	if value.Kind() != reflect.Slice {
+		return
+	}
+
+	if value.Len() == 0 {
+		slice = reflect.MakeSlice(value.Type(), 0, 0).Interface()
+
 		return
 	}
 

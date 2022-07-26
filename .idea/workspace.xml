@@ -4,28 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c3af81f-0f05-4578-b918-d18cf4e4d9f6" name="Default Changelist" comment="修复页数和每页个数类型">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/option_data.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/bool.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/duration.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/int32.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/int64.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/int8.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/setter/string.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uri_scheme.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/field.go" beforeDir="false" afterPath="$PROJECT_DIR$/field.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/option_fields.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/page.go" beforeDir="false" afterPath="$PROJECT_DIR$/page.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/page_data.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/page_option.go" beforeDir="false" afterPath="$PROJECT_DIR$/page_option.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/page_options.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/struct.go" beforeDir="false" afterPath="$PROJECT_DIR$/struct.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/uri.go" beforeDir="false" />
-    </list>
+    <list default="true" id="7c3af81f-0f05-4578-b918-d18cf4e4d9f6" name="Default Changelist" comment="新增JWT签发验证相关的方法" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,7 +18,13 @@
         <option name="title" value="All" />
       </GitPushTagMode>
     </option>
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitToolBoxStore">
@@ -106,7 +91,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
@@ -116,17 +100,20 @@
     <MESSAGE value="增加字段列表类型" />
     <MESSAGE value="修复页数和每页个数类型" />
     <MESSAGE value="字段列表改为接口实现" />
-    <option name="LAST_COMMIT_MESSAGE" value="字段列表改为接口实现" />
+    <MESSAGE value="新增JWT签发验证相关的方法" />
+    <option name="LAST_COMMIT_MESSAGE" value="新增JWT签发验证相关的方法" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
     <environment>
       <map>
         <entry key="GOPROXY" value="https://goproxy.cn" />
       </map>
     </environment>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/gox$TestManualPaging_Sort_in_github_com_storezhang_gox__1_.out" NAME="TestManualPaging_Sort in github.com/storezhang/gox (1) Coverage Results" MODIFIED="1652067565918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="GoCoverage" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

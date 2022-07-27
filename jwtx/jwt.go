@@ -25,7 +25,7 @@ type JWTConfig struct {
 // 例如只允许一个Token有效
 type extraKeyFunc func(token *jwt.Token) bool
 
-type jwtTool struct {
+type JwtTool struct {
 	// 签名算法
 	method string
 	// 签名密钥
@@ -40,8 +40,8 @@ type jwtTool struct {
 	keyFunc jwt.Keyfunc
 }
 
-func NewJWT(config JWTConfig, payload interface{}, extra ...extraKeyFunc) *jwtTool {
-	return &jwtTool{
+func NewJWT(config JWTConfig, payload interface{}, extra ...extraKeyFunc) *JwtTool {
+	return &JwtTool{
 		method:     config.Method,
 		key:        config.Key,
 		scheme:     config.Scheme,
@@ -76,7 +76,7 @@ func NewJWT(config JWTConfig, payload interface{}, extra ...extraKeyFunc) *jwtTo
 	}
 }
 
-func (j *jwtTool) Sign(payload interface{}) (string, error) {
+func (j *JwtTool) Sign(payload interface{}) (string, error) {
 	var (
 		data []byte
 		err  error
@@ -109,7 +109,7 @@ func (j *jwtTool) Sign(payload interface{}) (string, error) {
 	return tokenString, nil
 }
 
-func (j *jwtTool) Parse(tokenString string) (*jwt.StandardClaims, map[string]interface{}, error) {
+func (j *JwtTool) Parse(tokenString string) (*jwt.StandardClaims, map[string]interface{}, error) {
 	var (
 		err   error
 		token *jwt.Token
@@ -127,7 +127,7 @@ func (j *jwtTool) Parse(tokenString string) (*jwt.StandardClaims, map[string]int
 	return token.Claims.(*jwt.StandardClaims), token.Header, nil
 }
 
-func (j *jwtTool) Payload(tokenString string) (interface{}, error) {
+func (j *JwtTool) Payload(tokenString string) (interface{}, error) {
 	var err error
 
 	if j.scheme != "" && strings.HasPrefix(tokenString, j.scheme) {

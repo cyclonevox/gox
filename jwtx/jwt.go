@@ -14,7 +14,7 @@ type JWTConfig struct {
 	// 签名算法
 	Method string `default:"HS256" yaml:"method" validate:"required,oneof=HS256 HS384 HS512"`
 	// 密钥
-	Key []byte `yaml:"key" validate:"required"`
+	Key string `yaml:"key" validate:"required"`
 	// 统一前缀
 	Scheme string `yaml:"scheme"`
 	// 有效期，单位分组
@@ -43,7 +43,7 @@ type JwtTool struct {
 func NewJWT(config JWTConfig, payload interface{}, extra ...extraKeyFunc) *JwtTool {
 	return &JwtTool{
 		method:     config.Method,
-		key:        config.Key,
+		key:        []byte(config.Key),
 		scheme:     config.Scheme,
 		expiration: config.Expiration,
 		payload:    payload,

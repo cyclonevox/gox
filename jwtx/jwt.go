@@ -1,12 +1,12 @@
 package jwtx
 
 import (
-	"encoding/json"
-	"reflect"
-	"strings"
-	"time"
+	`encoding/json`
+	`reflect`
+	`strings`
+	`time`
 
-	"github.com/dgrijalva/jwt-go"
+	`github.com/dgrijalva/jwt-go`
 )
 
 // JWTConfig JWT配置

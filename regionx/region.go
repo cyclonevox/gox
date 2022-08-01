@@ -41,8 +41,15 @@ func Init() {
 	}
 }
 
-func GetByCode(code core.RegionCode) Region {
-	return regionMap[code]
+func GetByCode(code interface{}) Region {
+	switch code := code.(type) {
+	case string:
+		return regionMap[core.RegionCode(code)]
+	case core.RegionCode:
+		return regionMap[code]
+	}
+
+	return Region{}
 }
 
 func ListChildren(code core.RegionCode) []Region {

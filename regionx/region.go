@@ -44,8 +44,16 @@ func Init() {
 func GetByCode(code interface{}) Region {
 	switch code := code.(type) {
 	case string:
+		if code == "" {
+			code = string(core.RegionCodeCountry)
+		}
+
 		return regionMap[core.RegionCode(code)]
 	case core.RegionCode:
+		if code == "" {
+			code = core.RegionCodeCountry
+		}
+
 		return regionMap[code]
 	}
 
@@ -59,6 +67,12 @@ func ListChildren(code core.RegionCode) []Region {
 	}
 
 	return region.Children
+}
+
+func IsValidCode(code string) bool {
+	_, ok := regionMap[core.RegionCode(code)]
+
+	return ok
 }
 
 func (r Region) FullName(sep ...string) string {
@@ -81,6 +95,24 @@ func (r Region) FullName(sep ...string) string {
 
 func (r Region) IsLeaf() bool {
 	return len(r.Children) == 0
+}
+
+// Parent 返回上一级
+func (r Region) Parent() Region {
+	if len(r.Parents) != 0 {
+		return r.Parents[0]
+	}
+
+	return r
+}
+
+// Top 返回顶层（非全国）
+func (r Region) Top() Region {
+	if len(r.Parents) != 0 {
+		return r.Parents[len(r.Parents)-1]
+	}
+
+	return r
 }
 
 func set(region Region, m map[core.RegionCode]Region) {

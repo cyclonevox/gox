@@ -61,13 +61,7 @@ func (ce *CodeError) ToData() interface{} {
 }
 
 func (ce *CodeError) Error() (str string) {
-	if data, err := json.Marshal(ce); nil != err {
-		return
-	} else {
-		str = string(data)
-	}
-
-	return
+	return ce.Message
 }
 
 func (ce *CodeError) Parse(i ...interface{}) *CodeError {

@@ -71,7 +71,7 @@ func NewJWT(config JWTConfig, payload interface{}, extra ...extraKeyFunc) *JwtTo
 				}
 			}
 
-			return config.Key, nil
+			return []byte(config.Key), nil
 		},
 	}
 }

@@ -15,7 +15,7 @@ func (s Sensitive) MarshalJSON() ([]byte, error) {
 	}
 
 	if len(s) == 18 {
-		hiding := fmt.Sprintf(`"%s%s%s"`, s[:3], "****", s[14:])
+		hiding := fmt.Sprintf(`"%s%s%s"`, s[:3], "***********", s[14:])
 
 		return []byte(hiding), nil
 	}

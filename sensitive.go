@@ -2,18 +2,20 @@ package gox
 
 import (
 	`fmt`
-	`regexp`
 	`strings`
 )
 
 type Sensitive string
 
 func (s Sensitive) MarshalJSON() ([]byte, error) {
-	mobile := `^[+]86[-]1([3,4,5,6,7,8,9][0-9])\d{8}$`
-	reg := regexp.MustCompile(mobile)
-
-	if reg.MatchString(string(s)) {
+	if len(s) == 15 {
 		hiding := fmt.Sprintf(`"%s%s%s"`, s[:7], "****", s[11:])
+
+		return []byte(hiding), nil
+	}
+
+	if len(s) == 18 {
+		hiding := fmt.Sprintf(`"%s%s%s"`, s[:3], "****", s[14:])
 
 		return []byte(hiding), nil
 	}

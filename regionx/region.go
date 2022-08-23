@@ -103,7 +103,7 @@ func (r Region) Parent() Region {
 		return r.Parents[0]
 	}
 
-	return r
+	return Region{}
 }
 
 // Top 返回顶层（非全国）

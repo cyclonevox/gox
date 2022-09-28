@@ -27,8 +27,8 @@ type RegionLevel int8
 func (rc RegionCode) Prefix() string {
 	code := string(rc)
 	for {
-		if strings.HasSuffix(code, "0") {
-			code = code[:len(code)-1]
+		if strings.HasSuffix(code, "00") {
+			code = code[:len(code)-2]
 
 			continue
 		}

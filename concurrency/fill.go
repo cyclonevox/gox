@@ -2,7 +2,9 @@ package concurrency
 
 import (
 	`fmt`
+	`math`
 	`reflect`
+	`runtime`
 	`sync`
 )
 
@@ -46,6 +48,12 @@ func Fills(slice interface{}, fun FillFunc, maxGoroutines ...int) {
 				defer func() {
 					if r := recover(); r != nil {
 						fmt.Println("调用fills方法发生panic")
+
+						buf := make([]byte, math.MaxInt16)
+						buf = buf[:runtime.Stack(buf, false)]
+
+						fmt.Printf("[Panic]%s", r)
+						fmt.Println(string(buf))
 					}
 
 					wg.Done()

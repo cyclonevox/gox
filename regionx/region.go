@@ -26,13 +26,17 @@ type Region struct {
 	Children  []Region         `json:"children,omitempty"`
 }
 
-func Init() {
+func Init(data []byte) {
 	var (
 		err     error
 		regions []Region
 	)
 
-	if err = json.Unmarshal(regionData, &regions); err != nil {
+	if len(data) == 0 {
+		data = regionData
+	}
+
+	if err = json.Unmarshal(data, &regions); err != nil {
 		panic(err)
 	}
 
@@ -103,7 +107,7 @@ func (r Region) Parent() Region {
 		return r.Parents[0]
 	}
 
-	return r
+	return Region{}
 }
 
 // Top 返回顶层（非全国）

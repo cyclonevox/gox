@@ -24,6 +24,7 @@ type Region struct {
 	Latitude  float64          `json:"latitude"`
 	Parents   []Region         `json:"parents,omitempty"`
 	Children  []Region         `json:"children,omitempty"`
+	Official  bool             `json:"official"`
 }
 
 func Init(data []byte) {
@@ -64,13 +65,24 @@ func GetByCode(code interface{}) Region {
 	return Region{}
 }
 
-func ListChildren(code core.RegionCode) []Region {
+func ListChildren(code core.RegionCode, official ...bool) []Region {
 	region := GetByCode(code)
 	if len(region.Children) == 0 {
 		return make([]Region, 0)
 	}
 
-	return region.Children
+	if len(official) == 0 {
+		return region.Children
+	}
+
+	var children []Region
+	for _, child := range region.Children {
+		if official[0] == child.Official {
+			children = append(children, child)
+		}
+	}
+
+	return children
 }
 
 func IsValidCode(code string) bool {

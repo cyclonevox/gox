@@ -139,6 +139,7 @@ func set(region Region, m map[core.RegionCode]Region) {
 		Longitude: region.Longitude,
 		Latitude:  region.Latitude,
 		Parents:   region.Parents,
+		Official:  region.Official,
 	}
 
 	for _, child := range region.Children {
@@ -148,6 +149,7 @@ func set(region Region, m map[core.RegionCode]Region) {
 			Type:      child.Type,
 			Longitude: child.Longitude,
 			Latitude:  child.Latitude,
+			Official:  child.Official,
 		})
 
 		set(child, m)

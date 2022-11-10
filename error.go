@@ -1,8 +1,9 @@
 package gox
 
 import (
-	`encoding/json`
-	`fmt`
+	"encoding/json"
+	"fmt"
+	"strings"
 )
 
 type (
@@ -69,4 +70,19 @@ func (ce *CodeError) Parse(i ...interface{}) *CodeError {
 	e.Message = fmt.Sprintf(e.Message, i...)
 
 	return &e
+}
+
+func HandleRpcErr(err error) (codeError *CodeError) {
+	msg := err.Error()
+	// handle rpc error
+	if index := strings.LastIndex(err.Error(), "="); index != -1 && index+2 < len(msg) {
+		msg = msg[index+2:]
+
+		codeError = new(CodeError)
+		if err = json.Unmarshal([]byte(msg), codeError); err != nil {
+			return
+		}
+	}
+
+	return codeError
 }

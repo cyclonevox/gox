@@ -72,16 +72,13 @@ func (ce *CodeError) Parse(i ...interface{}) *CodeError {
 	return &e
 }
 
-func HandleRpcErr(err error) (codeError *CodeError) {
-	msg := err.Error()
+func HandleRpcErr(errMsg string) (codeError *CodeError) {
 	// handle rpc error
-	if index := strings.LastIndex(err.Error(), "="); index != -1 && index+2 < len(msg) {
-		msg = msg[index+2:]
+	if index := strings.LastIndex(errMsg, "="); index != -1 && index+2 < len(errMsg) {
+		errMsg = errMsg[index+2:]
 
 		codeError = new(CodeError)
-		if err = json.Unmarshal([]byte(msg), codeError); err != nil {
-			return
-		}
+		_ = json.Unmarshal([]byte(errMsg), codeError)
 	}
 
 	return codeError

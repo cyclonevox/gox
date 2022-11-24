@@ -66,13 +66,13 @@ func (lc *lruCache) Set(key any, value any) {
 }
 
 func (lc *lruCache) Get(key any) (any, bool) {
+	lc.mutex.Lock()
+	defer lc.mutex.Unlock()
+
 	val, ok := lc.cache[key]
 	if !ok {
 		return nil, false
 	}
-
-	lc.mutex.Lock()
-	defer lc.mutex.Unlock()
 
 	lc.lst.MoveToFront(val)
 
@@ -80,13 +80,13 @@ func (lc *lruCache) Get(key any) (any, bool) {
 }
 
 func (lc *lruCache) Del(key any) {
+	lc.mutex.Lock()
+	defer lc.mutex.Unlock()
+
 	val, ok := lc.cache[key]
 	if !ok {
 		return
 	}
-
-	lc.mutex.Lock()
-	defer lc.mutex.Unlock()
 
 	lc.lst.Remove(val)
 	delete(lc.cache, key)

@@ -44,10 +44,6 @@ func TestNewLRUCache(t *testing.T) {
 
 	lru.Flush()
 
-	if len(lru.(*lruCache).cache) != 0 {
-		t.Fatalf("lru Flush错误")
-	}
-
 	if lru.(*lruCache).lst.Len() != 0 {
 		t.Fatalf("lru Flush错误")
 	}

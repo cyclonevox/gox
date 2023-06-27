@@ -1,8 +1,8 @@
 package gox
 
 import (
-	`fmt`
-	`testing`
+	"fmt"
+	"testing"
 )
 
 func TestManualPaging_Sort_PtrSlice(t *testing.T) {
@@ -131,5 +131,49 @@ func TestManualPaging_Sort_StructSlice(t *testing.T) {
 		}
 
 	}
+}
 
+func TestPaging_EscapedLikeKeyword(t *testing.T) {
+	type suit struct {
+		input *Paging
+		want  string
+	}
+
+	suits := []*suit{
+		{
+			input: &Paging{Keyword: ""},
+			want:  "",
+		},
+		{
+			input: &Paging{Keyword: "%_"},
+			want:  "\\%\\_",
+		},
+		{
+			input: &Paging{Keyword: "12345"},
+			want:  "12345",
+		},
+		{
+			input: &Paging{Keyword: "我是关键字"},
+			want:  "我是关键字",
+		},
+		{
+			input: &Paging{Keyword: "我是关%键字"},
+			want:  "我是关\\%键字",
+		},
+		{
+			input: &Paging{Keyword: "我是关_键字"},
+			want:  "我是关\\_键字",
+		},
+		{
+			input: &Paging{Keyword: "我是关_键%字"},
+			want:  "我是关\\_键\\%字",
+		},
+	}
+
+	for _, suit := range suits {
+		output := suit.input.EscapedLikeKeyword()
+		if output != suit.want {
+			t.Fail()
+		}
+	}
 }

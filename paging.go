@@ -1,12 +1,12 @@
 package gox
 
 import (
-	`fmt`
-	`reflect`
-	`sort`
-	`strings`
+	"fmt"
+	"reflect"
+	"sort"
+	"strings"
 
-	`github.com/olivere/elastic/v7`
+	"github.com/olivere/elastic/v7"
 )
 
 type SortBy string
@@ -30,7 +30,38 @@ type Paging struct {
 	SortOrder string `default:"DESC" json:"sortOrder" param:"sortOrder" query:"sortOrder" form:"sortOrder" xml:"sortOrder"  validate:"oneof=asc ASC ascending ASCENDING desc DESC descending DESCENDING"`
 }
 
-func (p Paging) manual() ManualPagingInfo {
+func (p *Paging) EscapedLikeKeyword() string {
+	// A byte loop is correct because all metacharacters are ASCII.
+	var i int
+	for i = 0; i < len(p.Keyword); i++ {
+		if isSpecialForLike(p.Keyword[i]) {
+			break
+		}
+	}
+	// No meta characters found, so return original string.
+	if i >= len(p.Keyword) {
+		return p.Keyword
+	}
+
+	b := make([]byte, 2*len(p.Keyword)-i)
+	copy(b, p.Keyword[:i])
+	j := i
+	for ; i < len(p.Keyword); i++ {
+		if isSpecialForLike(p.Keyword[i]) {
+			b[j] = '\\'
+			j++
+		}
+		b[j] = p.Keyword[i]
+		j++
+	}
+	return string(b[:j])
+}
+
+func isSpecialForLike(b byte) bool {
+	return b == '%' || b == '_'
+}
+
+func (p *Paging) manual() ManualPagingInfo {
 	return ManualPagingInfo{
 		Page:    p.Page,
 		PerPage: p.PerPage,

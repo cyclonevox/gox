@@ -11,7 +11,7 @@ const defaultLRUCap = math.MaxInt16
 type lruCache struct {
 	cap   int
 	lst   *list.List
-	cache map[any]*list.Element
+	cache sync.Map
 	mutex sync.Mutex
 }
 
@@ -31,9 +31,8 @@ func NewLRUCache(cap ...int) Cache {
 	}
 
 	return &lruCache{
-		cap:   c,
-		lst:   list.New(),
-		cache: make(map[any]*list.Element, c),
+		cap: c,
+		lst: list.New(),
 	}
 }
 
@@ -42,31 +41,33 @@ func (lc *lruCache) Set(key any, value any) {
 	defer lc.mutex.Unlock()
 
 	// key存在，移到最近的节点，更新value值
-	if element, ok := lc.cache[key]; ok {
-		element.Value.(*node).value = value
-		lc.lst.MoveToFront(element)
+	if element, ok := lc.cache.Load(key); ok {
+		e := element.(*list.Element)
 
-		lc.cache[key] = element
+		e.Value.(*node).value = value
+		lc.lst.MoveToFront(e)
+
+		lc.cache.Store(key, e)
 
 		return
 	}
 
 	// 已达到最大数量，移除最远节点
-	if len(lc.cache) == lc.cap {
+	if lc.lst.Len() == lc.cap {
 		back := lc.lst.Back()
 		lc.lst.Remove(back)
 
-		delete(lc.cache, back.Value.(*node).key)
+		lc.cache.Delete(back.Value.(*node).key)
 	}
 
 	// 添加最近的节点
-	lc.cache[key] = lc.lst.PushFront(&node{key: key, value: value})
+	lc.cache.Store(key, lc.lst.PushFront(&node{key: key, value: value}))
 
 	return
 }
 
 func (lc *lruCache) Get(key any) (any, bool) {
-	val, ok := lc.cache[key]
+	val, ok := lc.cache.Load(key)
 	if !ok {
 		return nil, false
 	}
@@ -74,13 +75,14 @@ func (lc *lruCache) Get(key any) (any, bool) {
 	lc.mutex.Lock()
 	defer lc.mutex.Unlock()
 
-	lc.lst.MoveToFront(val)
+	value := val.(*list.Element)
+	lc.lst.MoveToFront(value)
 
-	return val.Value.(*node).value, true
+	return value.Value.(*node).value, true
 }
 
 func (lc *lruCache) Del(key any) {
-	val, ok := lc.cache[key]
+	val, ok := lc.cache.Load(key)
 	if !ok {
 		return
 	}
@@ -88,8 +90,8 @@ func (lc *lruCache) Del(key any) {
 	lc.mutex.Lock()
 	defer lc.mutex.Unlock()
 
-	lc.lst.Remove(val)
-	delete(lc.cache, key)
+	lc.lst.Remove(val.(*list.Element))
+	lc.cache.Delete(key)
 }
 
 func (lc *lruCache) Flush() {
@@ -97,5 +99,9 @@ func (lc *lruCache) Flush() {
 	defer lc.mutex.Unlock()
 
 	lc.lst = list.New()
-	lc.cache = make(map[any]*list.Element, lc.cap)
+	lc.cache.Range(func(key, value any) bool {
+		lc.cache.Delete(key)
+
+		return true
+	})
 }
